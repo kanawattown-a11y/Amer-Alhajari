@@ -1,9 +1,9 @@
 <canvas id="pdf-canvas"></canvas>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.10.113/pdf.min.js"></script>
+<script src="pdf.js"></script>
 <script>
 const url = 'الصفحة الرئيسية.pdf';
 const pdfjsLib = window['pdfjs-dist/build/pdf'];
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.10.113/pdf.worker.min.js';
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.js';
 
 let pdfDoc = null, pageNum = 1;
 const canvas = document.getElementById('pdf-canvas');
