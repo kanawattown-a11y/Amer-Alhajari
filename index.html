@@ -23,12 +23,12 @@
 
 <canvas id="pdf-canvas"></canvas>
 
-<script src="pdf.js"></script>
-<script>
-const pdfjsLib = window.pdfjsLib; // النسخة المباشرة
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.js';
+<script type="module">
+import * as pdfjsLib from 'pdf.mjs';
 
-const url = 'الصفحة الرئيسية.pdf'; // تأكد أن اسم الملف مطابق
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.mjs';
+
+const url = 'الصفحة%20الرئيسية.pdf'; // ضع الملف في نفس المجلد مع الترميز الصحيح للمسافات
 
 let pdfDoc = null;
 let pageNum = 1;
