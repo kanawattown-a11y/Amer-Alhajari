@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>عارض PDF — قنوات</title>
+<title>عارض PDF — تحسين دقة الموبايل</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 
@@ -15,87 +15,26 @@
     --btn-radius:8px;
   }
   html,body{height:100%;margin:0;font-family:"Cairo",system-ui,Arial,Helvetica,sans-serif;background:var(--muted);color:var(--dark);-webkit-font-smoothing:antialiased}
-  header{
-    width:100%;
-    background:linear-gradient(90deg,var(--primary),#9b1226);
-    color:#fff;
-    display:flex;
-    align-items:center;
-    gap:12px;
-    padding:10px 14px;
-    box-sizing:border-box;
-    box-shadow:0 2px 6px rgba(0,0,0,0.12);
-  }
+  header{width:100%;background:linear-gradient(90deg,var(--primary),#9b1226);color:#fff;display:flex;align-items:center;gap:12px;padding:10px 14px;box-sizing:border-box;box-shadow:0 2px 6px rgba(0,0,0,0.12);}
   header img.logo{height:44px;width:auto;border-radius:6px;background:#fff;padding:4px}
   header h1{font-size:18px;margin:0;font-weight:700}
-
-  .controls{
-    width:100%;
-    max-width:1100px;
-    margin:12px auto 6px;
-    display:flex;
-    gap:8px;
-    align-items:center;
-    justify-content:center;
-    flex-wrap:wrap;
-    padding:0 12px;
-    box-sizing:border-box;
-  }
+  .controls{width:100%;max-width:1100px;margin:12px auto 6px;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;padding:0 12px;box-sizing:border-box;}
   .controls .group{display:flex;gap:8px;align-items:center}
-  button.ctrl{
-    background:transparent;
-    border:2px solid rgba(0,0,0,0.08);
-    padding:8px 12px;
-    border-radius:var(--btn-radius);
-    cursor:pointer;
-    font-weight:600;
-    min-width:44px;
-    box-shadow:0 1px 0 rgba(255,255,255,0.2) inset;
-    transition:all .14s ease;
-    background-color:#fff;
-  }
-  button.ctrl.primary{
-    background:var(--primary); color:#fff; border-color:transparent;
-  }
-  button.ctrl:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,0.08)}
+  button.ctrl{background:transparent;border:2px solid rgba(0,0,0,0.08);padding:8px 12px;border-radius:var(--btn-radius);cursor:pointer;font-weight:600;min-width:44px;background-color:#fff;}
+  button.ctrl.primary{background:var(--primary); color:#fff; border-color:transparent;}
   .page-label{font-weight:600}
-
-  .viewer-wrap{
-    width:100%;
-    display:flex;
-    justify-content:center;
-    padding:8px 12px 40px;
-    box-sizing:border-box;
-  }
-  .viewer{
-    width:100%;
-    max-width:1100px;
-    background:#fff;
-    border-radius:10px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.06);
-    padding:12px;
-    box-sizing:border-box;
-  }
-  canvas#pdf-canvas{width:100%;height:auto;display:block;border-radius:4px}
-
-  .fallback{
-    text-align:center;
-    margin-top:8px;
-    color:#444;
-    font-size:14px;
-  }
+  .viewer-wrap{width:100%;display:flex;justify-content:center;padding:8px 12px 40px;box-sizing:border-box;}
+  .viewer{width:100%;max-width:1100px;background:#fff;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,0.06);padding:12px;box-sizing:border-box;}
+  canvas#pdf-canvas{width:100%;height:auto;display:block;border-radius:4px;background:#eee}
+  .fallback{text-align:center;margin-top:8px;color:#444;font-size:14px;}
   .fallback a{color:var(--primary);font-weight:700;text-decoration:none}
-
-  @media (max-width:640px){
-    header h1{font-size:16px}
-    button.ctrl{padding:8px 10px;font-size:14px}
-  }
+  @media (max-width:640px){ header h1{font-size:16px} button.ctrl{padding:8px 10px;font-size:14px} }
 </style>
 </head>
 <body>
 
 <header>
-  <img class="logo" src="favicon-doc.png" alt="KANAWAT logo" />
+  <img class="logo" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh5PKxOyEy_qHhZUpBAsuXT8g53xn3LnpLoC6tAC2dWMWGJNgIV1zEB7G4wbEq5Pezt5mHARYiADeeJ9PYC5jLa3bRWVSG5Qx5Ibc7YB7lU9yjumwamfVxDnV6u5iS4Qu4VbMSA_JDiTwQk6C-upcJ57GhWALyNr-_0Jz6sSg_AjvwWBZZRXVWaVbrkwVhyhyphenhyphen/w72-h72-p-k-no-nu/KANAWAT%20CYPER%20LOGO.png" alt="KANAWAT logo" />
   <h1>صفحة بلدة قنوات الأولى — عارض المستندات</h1>
 </header>
 
@@ -104,7 +43,6 @@
     <button id="prev" class="ctrl">◀</button>
     <button id="next" class="ctrl">▶</button>
   </div>
-
   <div class="group page-label" aria-live="polite">
     <span id="pageNum">1</span> / <span id="pageCount">1</span>
   </div>
@@ -118,13 +56,15 @@
 </div>
 
 <script type="module">
+/* تحسين دقة الموبايل: نستخدم devicePixelRatio مع حد أقصى لتفادي استهلاك كبير */
 import * as pdfjsLib from './pdf.mjs';
-
 pdfjsLib.GlobalWorkerOptions.workerSrc = './pdf.worker.mjs';
 
-const url = 'الصفحة%20الرئيسية.pdf'; // اسم الملف مع ترميز المسافات إن وجدت
+const url = 'الصفحة%20الرئيسية.pdf'; // غيّر إن لزم
 const canvas = document.getElementById('pdf-canvas');
-const ctx = canvas.getContext('2d');
+const ctx = canvas.getContext('2d', { alpha: false });
+ctx.imageSmoothingEnabled = false; // يحسن حدة الرسم على بعض الأجهزة
+
 const pageNumSpan = document.getElementById('pageNum');
 const pageCountSpan = document.getElementById('pageCount');
 const downloadLink = document.getElementById('downloadLink');
@@ -132,26 +72,54 @@ const downloadLink = document.getElementById('downloadLink');
 let pdfDoc = null;
 let pageNum = 1;
 
-function renderPage(num){
-  pdfDoc.getPage(num).then(page => {
-    // حساب المقياس التلقائي ليتناسب مع عرض الحاوي
-    const containerWidth = Math.min(document.getElementById('viewer').clientWidth, 1100);
-    const unscaledViewport = page.getViewport({ scale: 1 });
-    const automaticScale = (containerWidth - 24) / unscaledViewport.width; // خصم الحشوة
-    const finalScale = Math.max(0.6, Math.min(2.2, automaticScale)); // ثوابت معقولة لمنع التشوه
+// حد أقصى لكثافة البكسلات لتوازن بين وضوح وآداء (يمكن تغييره)
+const MAX_DPR = 2; // جرب 2 (Retina) — لا تضع 3 أو 4 لأن يزيد استهلاك الذاكرة كثيرًا
+function getEffectiveDPR(){ return Math.min(window.devicePixelRatio || 1, MAX_DPR); }
 
-    const viewport = page.getViewport({ scale: finalScale });
+async function renderPage(num){
+  try {
+    const page = await pdfDoc.getPage(num);
+    const container = document.getElementById('viewer');
+    const containerWidth = Math.min(container.clientWidth, 1100);
+    const unscaledViewport = page.getViewport({ scale: 1 });
+
+    // نحدّد عرض CSS المطلوب، نخصم الحشوة (padding)
+    const targetCssWidth = Math.min(containerWidth - 24, unscaledViewport.width * 2.2); // لا نجعل العرض يفوق العرض الحقيقي بكثير
+    const baseScale = targetCssWidth / unscaledViewport.width;
+
+    // نضرب بمقياس الجهاز للحصول على دقة عالية في الـ backing store
+    const dpr = getEffectiveDPR();
+    const renderScale = baseScale * dpr;
+
+    // نستخدم viewport بالحجم النهائي للرسم
+    const viewport = page.getViewport({ scale: renderScale });
+
+    // اضبط حجم الباكينغ ستور (بكسل حقيقي)
     canvas.width = Math.floor(viewport.width);
     canvas.height = Math.floor(viewport.height);
 
-    const renderCtx = { canvasContext: ctx, viewport };
-    page.render(renderCtx).promise.then(() => {
-      pageNumSpan.textContent = pageNum;
-      downloadLink.href = url;
-    });
-  }).catch(err => {
+    // اضبط الحجم المعروض (CSS pixels) ليبقى مناسباً للشاشة
+    canvas.style.width = Math.floor(viewport.width / dpr) + 'px';
+    canvas.style.height = Math.floor(viewport.height / dpr) + 'px';
+
+    // منع أي تحويل غير مرغوب
+    ctx.setTransform(1,0,0,1,0,0);
+
+    const renderContext = {
+      canvasContext: ctx,
+      viewport: viewport,
+      // optional: enable interactive rendering
+    };
+
+    // ترسيم الصفحة
+    const renderTask = page.render(renderContext);
+    await renderTask.promise;
+
+    pageNumSpan.textContent = pageNum;
+    downloadLink.href = url;
+  } catch (err) {
     console.error('Render page error:', err);
-  });
+  }
 }
 
 function queueRenderPage(num){
@@ -161,7 +129,7 @@ function queueRenderPage(num){
   renderPage(pageNum);
 }
 
-// تحميل الوثيقة
+// تحميل الملف
 pdfjsLib.getDocument(url).promise.then(pdf => {
   pdfDoc = pdf;
   pageCountSpan.textContent = pdf.numPages;
@@ -172,11 +140,11 @@ pdfjsLib.getDocument(url).promise.then(pdf => {
   downloadLink.textContent = 'تحميل الملف';
 });
 
-// ربط الأزرار السابقة/التالية
+// تحكّم أزرار
 document.getElementById('prev').addEventListener('click', () => queueRenderPage(pageNum - 1));
 document.getElementById('next').addEventListener('click', () => queueRenderPage(pageNum + 1));
 
-// إعادة الحساب عند تغيير حجم الشاشة
+// إعادة الرسم عند تغيير حجم الشاشة
 window.addEventListener('resize', () => {
   if (pdfDoc) renderPage(pageNum);
 });
