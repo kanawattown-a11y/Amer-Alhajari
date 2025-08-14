@@ -34,7 +34,7 @@
 <body>
 
 <header>
-  <img class="logo" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh5PKxOyEy_qHhZUpBAsuXT8g53xn3LnpLoC6tAC2dWMWGJNgIV1zEB7G4wbEq5Pezt5mHARYiADeeJ9PYC5jLa3bRWVSG5Qx5Ibc7YB7lU9yjumwamfVxDnV6u5iS4Qu4VbMSA_JDiTwQk6C-upcJ57GhWALyNr-_0Jz6sSg_AjvwWBZZRXVWaVbrkwVhyhyphenhyphen/w72-h72-p-k-no-nu/KANAWAT%20CYPER%20LOGO.png" alt="KANAWAT logo" />
+  <img class="logo" src="favicon-doc.png" alt="KANAWAT logo" />
   <h1>صفحة بلدة قنوات الأولى — عارض المستندات (دقة عالية)</h1>
 </header>
 
@@ -79,9 +79,9 @@ let pdfDoc = null;
 let pageNum = 1;
 
 // إعدادات لتحسين الدقة
-const MAX_DPR = 3;        // سمحنا حتى 3 (Retina/4K أفضل)
-const maxCssScale = 3.5;  // أقصى مقدار لتوسيع CSS بالنسبة للعرض الأصلي
-const MAX_CANVAS_WIDTH = 8192; // حماية ضد تجاوز قيود المتصفح
+const MAX_DPR = 4;        // تم زيادة القيمة لزيادة الدقة
+const maxCssScale = 4.0;  // تم زيادة القيمة لزيادة الدقة
+const MAX_CANVAS_WIDTH = 16384; // تم زيادة القيمة لزيادة الدقة
 
 function getEffectiveDPR(){
   return Math.min(window.devicePixelRatio || 1, MAX_DPR);
@@ -172,3 +172,4 @@ window.addEventListener('resize', () => {
 
 </body>
 </html>
+
