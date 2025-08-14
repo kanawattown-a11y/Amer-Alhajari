@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>عارض PDF — تحسين دقة الموبايل</title>
+<title>عارض PDF — دقة عالية</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 
@@ -35,7 +35,7 @@
 
 <header>
   <img class="logo" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh5PKxOyEy_qHhZUpBAsuXT8g53xn3LnpLoC6tAC2dWMWGJNgIV1zEB7G4wbEq5Pezt5mHARYiADeeJ9PYC5jLa3bRWVSG5Qx5Ibc7YB7lU9yjumwamfVxDnV6u5iS4Qu4VbMSA_JDiTwQk6C-upcJ57GhWALyNr-_0Jz6sSg_AjvwWBZZRXVWaVbrkwVhyhyphenhyphen/w72-h72-p-k-no-nu/KANAWAT%20CYPER%20LOGO.png" alt="KANAWAT logo" />
-  <h1>صفحة بلدة قنوات الأولى — عارض المستندات</h1>
+  <h1>صفحة بلدة قنوات الأولى — عارض المستندات (دقة عالية)</h1>
 </header>
 
 <div class="controls" role="toolbar" aria-label="أدوات عرض PDF">
@@ -43,6 +43,7 @@
     <button id="prev" class="ctrl">◀</button>
     <button id="next" class="ctrl">▶</button>
   </div>
+
   <div class="group page-label" aria-live="polite">
     <span id="pageNum">1</span> / <span id="pageCount">1</span>
   </div>
@@ -56,14 +57,19 @@
 </div>
 
 <script type="module">
-/* تحسين دقة الموبايل: نستخدم devicePixelRatio مع حد أقصى لتفادي استهلاك كبير */
+/*
+  إعدادات الدقة:
+  - MAX_DPR: أعلى قيمة نسمح بها لـ devicePixelRatio (يزيد الوضوح لكن يستهلك موارد).
+  - maxCssScale: الحد الأقصى لمضاعفة عرض CSS نسبةً لحجم الصفحة الأصلية (يمنع تكبير مبالغ فيه).
+  - MAX_CANVAS_WIDTH: حماية ضد تجاوز حدود canvas في بعض المتصفحات.
+*/
 import * as pdfjsLib from './pdf.mjs';
 pdfjsLib.GlobalWorkerOptions.workerSrc = './pdf.worker.mjs';
 
-const url = 'الصفحة%20الرئيسية.pdf'; // غيّر إن لزم
+const url = 'الصفحة%20الرئيسية.pdf'; // غيّر الاسم إن دعت الحاجة
 const canvas = document.getElementById('pdf-canvas');
 const ctx = canvas.getContext('2d', { alpha: false });
-ctx.imageSmoothingEnabled = false; // يحسن حدة الرسم على بعض الأجهزة
+ctx.imageSmoothingEnabled = false;
 
 const pageNumSpan = document.getElementById('pageNum');
 const pageCountSpan = document.getElementById('pageCount');
@@ -72,9 +78,14 @@ const downloadLink = document.getElementById('downloadLink');
 let pdfDoc = null;
 let pageNum = 1;
 
-// حد أقصى لكثافة البكسلات لتوازن بين وضوح وآداء (يمكن تغييره)
-const MAX_DPR = 2; // جرب 2 (Retina) — لا تضع 3 أو 4 لأن يزيد استهلاك الذاكرة كثيرًا
-function getEffectiveDPR(){ return Math.min(window.devicePixelRatio || 1, MAX_DPR); }
+// إعدادات لتحسين الدقة
+const MAX_DPR = 3;        // سمحنا حتى 3 (Retina/4K أفضل)
+const maxCssScale = 3.5;  // أقصى مقدار لتوسيع CSS بالنسبة للعرض الأصلي
+const MAX_CANVAS_WIDTH = 8192; // حماية ضد تجاوز قيود المتصفح
+
+function getEffectiveDPR(){
+  return Math.min(window.devicePixelRatio || 1, MAX_DPR);
+}
 
 async function renderPage(num){
   try {
@@ -83,35 +94,44 @@ async function renderPage(num){
     const containerWidth = Math.min(container.clientWidth, 1100);
     const unscaledViewport = page.getViewport({ scale: 1 });
 
-    // نحدّد عرض CSS المطلوب، نخصم الحشوة (padding)
-    const targetCssWidth = Math.min(containerWidth - 24, unscaledViewport.width * 2.2); // لا نجعل العرض يفوق العرض الحقيقي بكثير
+    // عرض CSS الهدف (لا نجعل القيمة أكبر من unscaledViewport.width * maxCssScale)
+    const targetCssWidth = Math.min(containerWidth - 24, unscaledViewport.width * maxCssScale);
     const baseScale = targetCssWidth / unscaledViewport.width;
 
-    // نضرب بمقياس الجهاز للحصول على دقة عالية في الـ backing store
+    // DPR للحصول على backing store عالي الدقة
     const dpr = getEffectiveDPR();
-    const renderScale = baseScale * dpr;
+    let renderScale = baseScale * dpr;
 
-    // نستخدم viewport بالحجم النهائي للرسم
-    const viewport = page.getViewport({ scale: renderScale });
+    // احسب viewport بالمقياس المطلوب
+    let viewport = page.getViewport({ scale: renderScale });
 
-    // اضبط حجم الباكينغ ستور (بكسل حقيقي)
-    canvas.width = Math.floor(viewport.width);
-    canvas.height = Math.floor(viewport.height);
+    // إذا تجاوز عرض الـ canvas الحد الأقصى، نخفض عامل render ليناسب
+    let reduceFactor = 1;
+    if (viewport.width > MAX_CANVAS_WIDTH) {
+      reduceFactor = MAX_CANVAS_WIDTH / viewport.width;
+      renderScale = renderScale * reduceFactor;
+      viewport = page.getViewport({ scale: renderScale });
+    }
 
-    // اضبط الحجم المعروض (CSS pixels) ليبقى مناسباً للشاشة
-    canvas.style.width = Math.floor(viewport.width / dpr) + 'px';
-    canvas.style.height = Math.floor(viewport.height / dpr) + 'px';
+    // اضبط أبعاد الباكينغ ستور (بكسل حقيقي)
+    canvas.width = Math.max(1, Math.floor(viewport.width));
+    canvas.height = Math.max(1, Math.floor(viewport.height));
 
-    // منع أي تحويل غير مرغوب
+    // اضبط الأبعاد الظاهرة (CSS) لتظل مساوية للـ baseScale * unscaled width
+    // لاحظ أننا نقسم على (dpr * reduceFactor) لكي يبقى CSS width = baseScale * unscaledViewport.width
+    const cssWidth = Math.floor(viewport.width / (dpr * reduceFactor));
+    const cssHeight = Math.floor(viewport.height / (dpr * reduceFactor));
+    canvas.style.width = cssWidth + 'px';
+    canvas.style.height = cssHeight + 'px';
+
+    // أعد تعيين أي تحويل سابق
     ctx.setTransform(1,0,0,1,0,0);
 
     const renderContext = {
       canvasContext: ctx,
       viewport: viewport,
-      // optional: enable interactive rendering
     };
 
-    // ترسيم الصفحة
     const renderTask = page.render(renderContext);
     await renderTask.promise;
 
@@ -129,7 +149,7 @@ function queueRenderPage(num){
   renderPage(pageNum);
 }
 
-// تحميل الملف
+// تحميل المستند
 pdfjsLib.getDocument(url).promise.then(pdf => {
   pdfDoc = pdf;
   pageCountSpan.textContent = pdf.numPages;
@@ -140,7 +160,7 @@ pdfjsLib.getDocument(url).promise.then(pdf => {
   downloadLink.textContent = 'تحميل الملف';
 });
 
-// تحكّم أزرار
+// أزرار التنقل
 document.getElementById('prev').addEventListener('click', () => queueRenderPage(pageNum - 1));
 document.getElementById('next').addEventListener('click', () => queueRenderPage(pageNum + 1));
 
