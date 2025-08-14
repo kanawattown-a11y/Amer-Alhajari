@@ -1,22 +1,80 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عارض PDF كامل</title>
+<style>
+  body, html { margin:0; padding:0; height:100%; display:flex; flex-direction: column; align-items:center; }
+  canvas { width: 100%; height: auto; display: block; border:1px solid #ccc; margin-top:10px; }
+  .controls { margin-top:10px; display:flex; gap:10px; flex-wrap: wrap; justify-content:center; }
+  button { padding:5px 10px; font-size:16px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <button id="prev">الصفحة السابقة</button>
+  <button id="next">الصفحة التالية</button>
+  <button id="zoomIn">+</button>
+  <button id="zoomOut">-</button>
+  <span id="pageNum">1</span> / <span id="pageCount">1</span>
+</div>
+
 <canvas id="pdf-canvas"></canvas>
+
 <script src="pdf.js"></script>
 <script>
-const url = 'الصفحة الرئيسية.pdf';
-const pdfjsLib = window['pdfjs-dist/build/pdf'];
+const pdfjsLib = window.pdfjsLib; // النسخة المباشرة
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.js';
 
-let pdfDoc = null, pageNum = 1;
+const url = 'الصفحة الرئيسية.pdf'; // تأكد أن اسم الملف مطابق
+
+let pdfDoc = null;
+let pageNum = 1;
+let scale = 1.5;
+
 const canvas = document.getElementById('pdf-canvas');
 const ctx = canvas.getContext('2d');
 
+const pageNumSpan = document.getElementById('pageNum');
+const pageCountSpan = document.getElementById('pageCount');
+
+// عرض الصفحة
 function renderPage(num) {
     pdfDoc.getPage(num).then(page => {
-        const viewport = page.getViewport({ scale: 1.5 });
+        const viewport = page.getViewport({ scale: scale });
         canvas.height = viewport.height;
         canvas.width = viewport.width;
         page.render({ canvasContext: ctx, viewport: viewport });
+        pageNumSpan.textContent = pageNum;
     });
 }
 
-pdfjsLib.getDocument(url).promise.then(pdf => { pdfDoc = pdf; renderPage(pageNum); });
+// التنقل بين الصفحات
+function queueRenderPage(num) {
+    if (num < 1 || num > pdfDoc.numPages) return;
+    pageNum = num;
+    renderPage(pageNum);
+}
+
+// التكبير والتصغير
+function zoomIn() { scale += 0.2; renderPage(pageNum); }
+function zoomOut() { scale = Math.max(0.5, scale - 0.2); renderPage(pageNum); }
+
+// تحميل PDF
+pdfjsLib.getDocument(url).promise.then(pdf => {
+    pdfDoc = pdf;
+    pageCountSpan.textContent = pdf.numPages;
+    renderPage(pageNum);
+});
+
+// ربط الأزرار
+document.getElementById('prev').addEventListener('click', () => queueRenderPage(pageNum - 1));
+document.getElementById('next').addEventListener('click', () => queueRenderPage(pageNum + 1));
+document.getElementById('zoomIn').addEventListener('click', zoomIn);
+document.getElementById('zoomOut').addEventListener('click', zoomOut);
 </script>
+
+</body>
+</html>
